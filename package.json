@@ -1,0 +1,28 @@
+{
+  "name": "img-css-fx",
+  "version": "1.0.0",
+  "description": "download image with css effects",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RuanSena/img-css-fx.git"
+  },
+  "keywords": [
+    "puppeteer",
+    "image",
+    "effects\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b["
+  ],
+  "author": "ruansenadev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RuanSena/img-css-fx/issues"
+  },
+  "homepage": "https://github.com/RuanSena/img-css-fx#readme",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "puppeteer": "^3.0.4"
+  }
+}
