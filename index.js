@@ -1,14 +1,15 @@
+const localServer = require('./local')
 const editor = require('./editor')
 
-editor.open('https://www.colorzilla.com/images/colorzilla-for-chrome.png')
+editor.open('imageScreenshot.png', true)
     .then(() => {
         // define styles effects
-        editor.filter({blur: '4px', sepia: 0.4})
+        editor.filter({blur: '2px', sepia: 0.6})
     })
     .catch(console.error)
     .finally(() => {
         // apply styles
         editor.apply()
-        // screenshots the page
+        // screenshots the image
         editor.save('filter')
     })
