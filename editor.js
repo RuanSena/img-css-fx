@@ -1,11 +1,12 @@
 const pupp = require('puppeteer')
 const fs = require('fs')
 const path = require('path')
+const localServer = require('./local')
 
-const local = 'localhost:8080'
+const LOCAL = 'localhost:8080'
 let browser = null
 let page = null
-let img = null
+let imgHandle = null
 let styleFX = {
 
 }
@@ -13,12 +14,13 @@ const defaults = {
     filter: {blur: '', brightness: 1, contrast: 1, 'drop-shadow': '', grayscale: 0, 'hue-rotate': '', invert: 0, opacity: 1, saturate: 1, sepia: 0}
 }
 const editor = {
-    open: async(img='', localhost=false) => {
-        img = localhost ? `${local}/${img}` : img;
-        browser = await pupp.launch({headless: false});
+    open: async(imgPath='', localhost=false) => {
+        imgPath = localhost ? `${LOCAL}/${imgPath}` : imgPath;
+        browser = browser || await pupp.launch({headless: false});
         [page] = await browser.pages();
-        await page.goto(img, {timeout: 20000})
+        await page.goto(imgPath, {timeout: 20000})
         await page.waitFor('img')
+        imgHandle = await page.$('img')
     },
     filter: (options = {blur: '', brightness: 1, contrast: 1, drop_shadow: '', grayscale: 0, hue_rotate: '', invert: 0, opacity: 1, saturate: 1, sepia: 0}) => {
         let functions = []
@@ -35,7 +37,7 @@ const editor = {
         }
     },
     apply: async() => {
-        await page.evaluate((fx) => {
+        await imgHandle.evaluate((img, fx) => {
             img = document.querySelector('img')
             for(let prop in fx) {
                 img.style[prop] = fx[prop]
@@ -44,8 +46,16 @@ const editor = {
     },
     save: async(imgName='screenshot') => {
         fs.mkdirSync(path.join(__dirname, 'images'), {recursive: true})
-        await page.screenshot({path: path.join(__dirname, 'images', `${imgName}_${Object.keys(styleFX).join('_')}.png`)})
-        browser.close()
+        imgName = `${imgName}_${Object.keys(styleFX).join('_')}.png`
+        await imgHandle.screenshot({path: path.join(__dirname, 'images', imgName), type: 'png', omitBackground: true})
+        console.log('+ ' + imgName)
+    },
+    close: async() => {
+        // waits for 1s bef closing
+        await page.waitFor(1000)
+        await browser.close()
+        localServer.server.close()
+
     }
 }
 
