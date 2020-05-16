@@ -1,15 +1,14 @@
-const localServer = require('./local')
 const editor = require('./editor')
 
-editor.open('imageScreenshot.png', true)
+editor.open("https://i1.sndcdn.com/artworks-000644480044-6z10uu-t500x500.jpg")
     .then(() => {
         // define styles effects
         editor.filter({blur: '2px', sepia: 0.6})
-    })
-    .catch(console.error)
-    .finally(() => {
+
         // apply styles
         editor.apply()
         // screenshots the image
         editor.save('filter')
     })
+    .catch(console.error)
+    .finally(editor.close)
