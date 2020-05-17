@@ -10,10 +10,8 @@ exports.server = http.createServer(function (req, res) {
     file.serve(req, res, function (err, res) {
         if (err) { // An error as occured
             console.error("> Error serving " + req.url + " - " + err.message);
-            response.writeHead(err.status, err.headers);
-            response.end();
-        } else { // The file was served successfully
-            console.log("> " + req.url + " - " + res.message);
+            res.writeHead(err.status, err.headers);
+            res.end();
         }
     })
 }).listen(PORT, () => {
