@@ -7,7 +7,7 @@ const LOCAL = 'localhost:8080'
 let browser = null
 let page = null
 let imgHandle = null
-let ops = []
+let ops = null
 let styleFX = {
 
 }
@@ -15,13 +15,14 @@ const defaults = {
     filter: {blur: '', brightness: 1, contrast: 1, 'drop-shadow': '', grayscale: 0, 'hue-rotate': '', invert: 0, opacity: 1, saturate: 1, sepia: 0}
 }
 const editor = {
-    open: async(imgPath='', localhost=false) => {
-        imgPath = localhost ? `${LOCAL}/${imgPath}` : imgPath;
+    open: async(imgSource='', localhost=false) => {
+        imgSource = localhost ? `${LOCAL}/${imgSource}` : imgSource;
         browser = browser || await pupp.launch({headless: false});
         [page] = await browser.pages();
-        await page.goto(imgPath, {timeout: 20000})
+        await page.goto(imgSource, {timeout: 20000})
         await page.waitFor('img')
         imgHandle = await page.$('img')
+        ops = []
     },
     filter: (options = {blur: '', brightness: 1, contrast: 1, drop_shadow: '', grayscale: 0, hue_rotate: '', invert: 0, opacity: 1, saturate: 1, sepia: 0}) => {
         let functions = []
@@ -58,13 +59,12 @@ const editor = {
                     break
             }
         }
-        
+
         if(newWidth !== width) styleFX.width = newWidth + 'px'
         if(newHeight !== height) styleFX.height = newHeight + 'px'
         ops.push('resize')
     },
     apply: async() => {
-        console.log(styleFX)
         await imgHandle.evaluate((img, fx) => {
             img = document.querySelector('img')
             for(let prop in fx) {
@@ -72,11 +72,12 @@ const editor = {
             }
         }, styleFX)
     },
-    save: async(imgName='screenshot') => {
+    save: async(imgPath='screenshot') => {
         fs.mkdirSync(path.join(__dirname, 'images'), {recursive: true})
-        imgName = `${imgName}_${ops.join('_')}.png`
-        await imgHandle.screenshot({path: path.join(__dirname, 'images', imgName), type: 'png', omitBackground: true})
-        console.log('+ ' + imgName)
+        imgPath = `${imgPath}_${ops.join('_')}.png`
+        await imgHandle.screenshot({path: path.join(__dirname, 'images', imgPath), type: 'png', omitBackground: true})
+        imgPath = imgPath.split('\\')
+        return imgPath[imgPath.length-1]
     },
     close: async() => {
         // waits for 1s bef closing
